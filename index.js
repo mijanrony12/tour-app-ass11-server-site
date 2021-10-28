@@ -23,6 +23,16 @@ async function run() {
         await client.connect();
         const database = client.db('TG_Tour_database')
         const feedbackCollection = database.collection('feedback')
+
+
+        //get api feedback data
+        app.get('/feedback', async (req, res) => {
+              
+            const cursor = feedbackCollection.find({})
+            const result = await cursor.toArray()
+            console.log(result)
+            res.send(result)
+        })
     }
     finally
     {
