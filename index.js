@@ -84,9 +84,18 @@ async function run() {
     //approved status using api
       app.put('/approve/:id', async (req, res) => {
         const id = req.params.id
-
-        res.send('update id')
-        console.log(id);
+        const updateOrder = req.body;
+        const query={_id: ObjectId(id)}
+        const options = { upsert: true };
+                const updateDoc = {
+                      $set: {
+                        status: updateOrder.status
+                      },
+        };
+        const result = await placeOrderCollection.updateOne(query, updateDoc, options)
+        res.send(result)
+        console.log(result);
+        
       })
 
     }
