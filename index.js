@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
 const { MongoClient } = require('mongodb');
+const ObjectId= require('mongodb').ObjectId
 
 const app = express()
 const port = process.env.PORT || 5000;
@@ -20,19 +21,74 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try
     {
-        await client.connect();
-        const database = client.db('TG_Tour_database')
-        const feedbackCollection = database.collection('feedback')
+      await client.connect();
+      const database = client.db('TG_Tour_database')
+      const feedbackCollection = database.collection('feedback')
+      const packageCollection = database.collection('package')
+      const placeOrderCollection = database.collection('placeOrder')
 
 
-        //get api feedback data
-        app.get('/feedback', async (req, res) => {
+      //get api feedback data
+      app.get('/feedback', async (req, res) => {
               
-            const cursor = feedbackCollection.find({})
-            const result = await cursor.toArray()
-            console.log(result)
-            res.send(result)
-        })
+        const cursor = feedbackCollection.find({})
+        const result = await cursor.toArray()
+        console.log(result)
+        res.send(result)
+      })
+      
+      //get api package data
+      app.get('/package', async (req, res) => {
+        const cursor = packageCollection.find({})
+        const result = await cursor.toArray()
+        res.send(result)
+        // console.log(result); 
+      })
+
+        //post api for placeOrder
+        app.post('/placeOrder', async(req, res) => {
+         const result = await placeOrderCollection.insertOne(req.body)
+        res.send(result)
+        
+      })
+
+      //post api for add package
+      app.post('/addPackage', async (req, res) => {
+        const result = await packageCollection.insertOne(req.body)
+        res.send(result)
+        // console.log(result);
+      })
+
+    //get for placeOrder
+      app.get('/myOrder', async (req, res) => {
+        const cursor = placeOrderCollection.find({})
+        const result =await cursor.toArray();
+        res.send(result)
+      })
+
+      //single order delete api
+      app.delete('/myOrder/:id', async (req, res) => {
+        const id = req.params.id
+        const query = { _id: ObjectId(id) }
+        const result = await placeOrderCollection.deleteOne(query)
+        res.send(result)
+      })
+
+     //all orders api
+      app.get('/allOrder', async (req, res) => {
+        const cursor = placeOrderCollection.find({})
+        const result = await cursor.toArray()
+        res.send(result)
+      });
+
+    //approved status using api
+      app.put('/approve/:id', async (req, res) => {
+        const id = req.params.id
+
+        res.send('update id')
+        console.log(id);
+      })
+
     }
     finally
     {
